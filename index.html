@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>熹讚科技 | 智慧定位指導型徽章</title>
+    <style>
+        :root { --bg: #ffffff; --text: #000000; --gray: #f9f9f9; }
+        body { font-family: "Helvetica", "Arial", sans-serif; margin: 0; background: var(--bg); color: var(--text); }
+        .container { max-width: 600px; margin: 0 auto; padding: 40px 20px; }
+        
+        .page { display: none; }
+        .active { display: block; }
+
+        /* 標題區 */
+        header { border-bottom: 3px solid #000; padding-bottom: 10px; margin-bottom: 40px; text-align: center; }
+        h1 { letter-spacing: 5px; margin: 0; font-weight: 900; }
+        .brand-sub { font-size: 0.7rem; letter-spacing: 3px; color: #666; }
+
+        /* 產品列表 */
+        .product-card { display: flex; justify-content: space-between; align-items: center; padding: 25px 0; border-bottom: 1px solid #eee; }
+        .product-info { display: flex; align-items: center; gap: 15px; }
+        .img-box { width: 70px; height: 70px; background: #eee; border-radius: 4px; overflow: hidden; /* 確保圖片不溢出 */ }
+        .img-box img { width: 100%; height: 100%; object-fit: cover; /* 讓圖片填滿空間並裁切 */ }
+        .price { font-size: 0.9rem; color: #666; }
+        
+        select { border: 2px solid #000; padding: 8px; font-size: 1.1rem; width: 70px; font-weight: bold; outline: none; }
+
+        /* 總額區塊 */
+        .total-box { margin-top: 30px; text-align: right; background: var(--gray); padding: 30px; border-radius: 2px; }
+        .total-label { font-size: 0.8rem; letter-spacing: 2px; color: #888; }
+        .total-num { font-size: 2.2rem; font-weight: 900; margin-top: 5px; }
+
+        /* 支付與送出 */
+        .pay-area { text-align: center; margin-top: 50px; }
+        .neb-pay-btn { background: #000; color: #fff; border: none; padding: 20px 60px; font-size: 1.3rem; font-weight: bold; cursor: pointer; letter-spacing: 4px; transition: 0.3s; }
+        .neb-pay-btn:active { transform: scale(0.95); background: #333; }
+        .pay-hint { font-size: 0.7rem; color: #bbb; margin-top: 12px; display: block; letter-spacing: 1px; }
+
+        /* 第二頁：數據大螢幕 */
+        .stat-screen { text-align: center; padding: 80px 20px; border: 10px solid #000; margin-top: 20px; background: #fff; }
+        .counting-label { letter-spacing: 3px; color: #000; font-size: 1rem; font-weight: bold; }
+        .big-number { font-size: 5.5rem; font-weight: 900; margin: 30px 0; font-family: 'Courier New', Courier, monospace; }
+        .status-tag { background: #000; color: #fff; padding: 8px 20px; display: inline-block; font-size: 0.8rem; letter-spacing: 2px; }
+        .back-btn { margin-top: 60px; color: #bbb; cursor: pointer; text-decoration: none; font-size: 0.8rem; border: 1px solid #eee; padding: 10px 20px; display: inline-block; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div id="p1" class="page active">
+        <header>
+            <h1>熹讚科技</h1>
+            <div class="brand-sub">ADVANCED GUIDANCE SYSTEM</div>
+        </header>
+
+        <div class="product-list">
+            <div class="product-card">
+                <div class="product-info">
+                    <div class="img-box"><img src="images/01.jpg" alt="防水款徽章"></div>
+                    <div><strong>防水款</strong><div class="price">NT$ 2,999</div></div>
+                </div>
+                <select class="qty" data-p="2999" onchange="updateTotal()"></select>
+            </div>
+            <div class="product-card">
+                <div class="product-info">
+                    <div class="img-box"><img src="images/02.jpg" alt="防火款徽章"></div>
+                    <div><strong>防火款</strong><div class="price">NT$ 6,999</div></div>
+                </div>
+                <select class="qty" data-p="6999" onchange="updateTotal()"></select>
+            </div>
+            <div class="product-card">
+                <div class="product-info">
+                    <div class="img-box"><img src="images/03.jpg" alt="防炸款徽章"></div>
+                    <div><strong>防炸款</strong><div class="price">NT$ 29,999</div></div>
+                </div>
+                <select class="qty" data-p="29999" onchange="updateTotal()"></select>
+            </div>
+        </div>
+
+        <div class="total-box">
+            <div class="total-label">ESTIMATED TOTAL</div>
+            <div class="total-num">NT$ <span id="total-display">0</span></div>
+        </div>
+
+        <div class="pay-area">
+            <button class="neb-pay-btn" onclick="submitOrder()">Neb Pay</button>
+            <span class="pay-hint">（按下送出數據）</span>
+        </div>
+    </div>
+
+    <div id="p2" class="page">
+        <div class="stat-screen">
+            <div class="counting-label">TOTAL DEPLOYED UNITS</div>
+            <div class="big-number" id="counter-display">00,000</div>
+            <div class="status-tag">UNITS SYNCHRONIZED</div>
+            <p style="margin-top: 40px; font-size: 0.9rem; line-height: 1.8;">
+                核心伺服器已成功部署硬體指令<br>
+                數據已同步至熹讚科技雲端中心
+            </p>
+        </div>
+        <center>
+            <div class="back-btn" onclick="resetApp()">REBOOT SYSTEM</div>
+        </center>
+    </div>
+</div>
+
+<script>
+    // 1. 初始化下拉選單 (0-50)
+    const selects = document.querySelectorAll('.qty');
+    selects.forEach(s => {
+        for(let i=0; i<=50; i++) {
+            let opt = document.createElement('option');
+            opt.value = i;
+            opt.innerHTML = i;
+            s.appendChild(opt);
+        }
+    });
+
+    // 2. 更新總額顯示
+    function updateTotal() {
+        let totalAmount = 0;
+        selects.forEach(s => {
+            totalAmount += parseInt(s.value) * parseInt(s.dataset.p);
+        });
+        document.getElementById('total-display').innerText = totalAmount.toLocaleString();
+    }
+
+    // 3. 提交訂單邏輯 (產品總數 × 1000)
+    function submitOrder() {
+        let currentSessionQty = 0;
+        selects.forEach(s => { 
+            currentSessionQty += parseInt(s.value); 
+        });
+
+        if(currentSessionQty === 0) {
+            alert("請選擇至少一個產品。");
+            return;
+        }
+
+        // 切換頁面
+        document.getElementById('p1').classList.remove('active');
+        document.getElementById('p2').classList.add('active');
+        window.scrollTo(0, 0);
+
+        // 讀取歷史累積的「總產品顆數」
+        let totalProductCount = parseInt(localStorage.getItem('xizan_total_products') || 0);
+        
+        // 加上這一次買的顆數
+        totalProductCount += currentSessionQty;
+        
+        // 存回記憶體
+        localStorage.setItem('xizan_total_products', totalProductCount);
+
+        // 第二頁顯示：總顆數 * 1000
+        const finalDisplayNumber = totalProductCount * 1000;
+        animateNumber(finalDisplayNumber);
+    }
+
+    // 4. 數字增加動畫
+    function animateNumber(target) {
+        const display = document.getElementById('counter-display');
+        let current = 0;
+        const duration = 1000; 
+        const stepTime = 20;
+        const increment = target / (duration / stepTime);
+
+        const timer = setInterval(() => {
+            current += increment;
+            if (current >= target) {
+                display.innerText = target.toLocaleString();
+                clearInterval(timer);
+            } else {
+                display.innerText = Math.floor(current).toLocaleString();
+            }
+        }, stepTime);
+    }
+
+    // 5. 重置功能
+    function resetApp() {
+        if(confirm("確定要重置所有數據嗎？(這將清空所有已累積的部署數量)")) {
+            localStorage.removeItem('xizan_total_products');
+            location.reload();
+        }
+    }
+
+    // 首次載入或重置後更新總額
+    document.addEventListener('DOMContentLoaded', updateTotal);
+</script>
+
+</body>
+</html>

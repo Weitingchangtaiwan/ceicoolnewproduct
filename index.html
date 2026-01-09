@@ -100,7 +100,6 @@
             <div class="big-number" id="counter-display">00,000</div>
             <div class="status-tag">CORE SYNCHRONIZED</div>
             <p style="margin-top: 40px; font-size: 0.95rem; line-height: 1.8; color: #333;">
-                核心伺服器已成功部署硬體指令<br>
                 數據已同步至熹讚科技雲端中心
             </p>
         </div>
@@ -135,22 +134,19 @@
         window.scrollTo(0, 0);
 
         /* 有機計算法 */
-        // a. 隨機起始值 (每台裝置、每次打開都不同)
         const base = Math.floor(Math.random() * (92000 - 86000 + 1)) + 86000;
-        // b. 使用者點擊的數量
         const added = userQty;
-        // c. 額外隨機增量 (模擬現場其他人的同步訂購感)
         const ghost = Math.floor(Math.random() * 9) + 1; 
         
         const finalTarget = base + added + ghost;
         animateNumber(finalTarget);
     }
 
-    // 4. 高階滾動動畫
+    // 4. 滾動動畫
     function animateNumber(target) {
         const display = document.getElementById('counter-display');
-        let current = Math.floor(target * 0.85); // 從目標的 85% 開始跑，增加即時感
-        const duration = 1500; // 動畫 1.5 秒
+        let current = Math.floor(target * 0.85); 
+        const duration = 1500; 
         const steps = 60;
         const increment = (target - current) / steps;
         
